@@ -1,18 +1,14 @@
 """Smoke tests proving discovery works and helpers build valid Issues."""
 
-import json
-import os
-import tempfile
-
 from .base import AnalysisTestCase
 from model import Issue, Event, State
 from .helpers import make_issue, make_event, load_issues
 
 
 class TestDiscoverySmoke(AnalysisTestCase):
-    """Ensure the loader actually discovers and parses issues from a JSON file."""
+    """Runs under unittest discover and checks the helpers build valid Issues."""
 
-    def test_discover_loads_issues_from_json(self) -> None:
+    def test_load_issues_builds_valid_issues(self) -> None:
         """Create two issue dicts, load them, and verify both are valid Issue objects."""
 
         sample = [
@@ -20,31 +16,21 @@ class TestDiscoverySmoke(AnalysisTestCase):
             make_issue(number=2, url="https://example.com/2", state="closed", title="Second"),
         ]
 
-        tmpfile = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False, dir=os.getcwd()
-        )
-        json.dump(sample, tmpfile)
-        path = tmpfile.name
-        tmpfile.close()
+        result = load_issues(sample)
+        self.assertEqual(len(result), 2)
 
-        try:
-            result = load_issues(sample)
-            self.assertEqual(len(result), 2)
+        # Issue #1 (open)
+        i1 = result[0]
+        self.assertIsInstance(i1, Issue)
+        self.assertEqual(i1.title, "First")
+        self.assertEqual(i1.number, 1)
+        self.assertEqual(i1.state, State.open)
 
-            # Issue #1 (open)
-            i1 = result[0]
-            self.assertIsInstance(i1, Issue)
-            self.assertEqual(i1.title, "First")
-            self.assertEqual(i1.number, 1)
-            self.assertEqual(i1.state, State.open)
-
-            # Issue #2 (closed)
-            i2 = result[1]
-            self.assertIsInstance(i2, Issue)
-            self.assertEqual(i2.title, "Second")
-            self.assertEqual(i2.state, State.closed)
-        finally:
-            os.unlink(path)
+        # Issue #2 (closed)
+        i2 = result[1]
+        self.assertIsInstance(i2, Issue)
+        self.assertEqual(i2.title, "Second")
+        self.assertEqual(i2.state, State.closed)
 
 
 class TestHelpersValidity(AnalysisTestCase):
@@ -99,6 +85,7 @@ class TestHelpersValidity(AnalysisTestCase):
         load_issues(dicts)
         second_singleton = data_loader._ISSUES
         # Second call replaced the singleton with a fresh list of Issues
+        self.assertIsNot(second_singleton, first_singleton)
         self.assertIsInstance(second_singleton[0], Issue)
 
     # -- make_event ----------------------------------------------------------

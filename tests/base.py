@@ -4,41 +4,39 @@ from unittest.mock import patch
 
 import matplotlib.pyplot as plt
 
-# Local module imports (needed in tearDown)
 import data_loader
 import config
 
 
+# Environment variables the app reads.
+APP_ENV_KEYS = ("user", "label", "feature", "ENPM611_PROJECT_DATA_PATH")
+
+
 class AnalysisTestCase(unittest.TestCase):
-    """Base test case that resets shared state between tests."""
+    """Base test case that resets shared state between tests.
 
-    @classmethod
-    def setUpClass(cls):
-        # Patch matplotlib show for the entire test class
-        cls._show_patcher = patch("matplotlib.pyplot.show")
-        cls._show_patcher.start()
-
-    @classmethod
-    def tearDownClass(cls):
-        plt.close("all")
-        cls._show_patcher.stop()
+    Subclasses that define their own setUp/tearDown must call
+    super().setUp() / super().tearDown().
+    """
 
     def setUp(self):
-        # Reset cached module-level state
-        data_loader._ISSUES = None
-        config._config = None
+        self._reset_shared_state()
 
-        # Remove environment variables that can leak between tests
-        for env_key in ("USER", "LABEL", "ENPM611_PROJECT_DATA_PATH"):
-            os.environ.pop(env_key, None)
+        # Keep charts from opening a window.
+        show_patcher = patch("matplotlib.pyplot.show")
+        self.mock_show = show_patcher.start()
+        self.addCleanup(show_patcher.stop)
 
     def tearDown(self):
-        # Reset cached module-level state
+        self._reset_shared_state()
+        plt.close("all")
+
+    @staticmethod
+    def _reset_shared_state():
+        # Cached module-level state
         data_loader._ISSUES = None
         config._config = None
 
-        # Remove environment variables that can leak between tests
-        for env_key in ("USER", "LABEL", "ENPM611_PROJECT_DATA_PATH"):
+        # Environment variables that can leak between tests
+        for env_key in APP_ENV_KEYS:
             os.environ.pop(env_key, None)
-
-        plt.close("all")

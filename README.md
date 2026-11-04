@@ -231,11 +231,11 @@ _Implemented Feature 3: Developed the Discussion Trend Analysis 'discussion_tren
 From the project root, run:
 
 ```
-python -m coverage run -m uittest discover
+python -m coverage run -m unittest discover
 ```
 
 This command creates a .coverage data file. Generate a readable report with:
 
 ```
-python -m coverage report --omit="*/test_*.opy,tests/*"
+python -m coverage report --omit="*/test_*.py,tests/*"
 ```
