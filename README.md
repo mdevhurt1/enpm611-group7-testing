@@ -226,3 +226,16 @@ _Implemented Feature 1: Label Resolution Analysis. Created `label_resolution.py`
 
 ### Divhya Gnanasekar
 _Implemented Feature 3: Developed the Discussion Trend Analysis 'discussion_trend_analysis.py', including monthly activity tracking, discussion intensity classification, hotspot identification, console reports, and visualizations._
+
+## Running the tests
+From the project root, run:
+
+```
+python -m coverage run -m uittest discover
+```
+
+This command creates a .coverage data file. Generate a readable report with:
+
+```
+python -m coverage report --omit="*/test_*.opy,tests/*"
+```
