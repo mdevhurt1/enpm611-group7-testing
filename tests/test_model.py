@@ -1,8 +1,4 @@
-"""Tests for model.py: _as_utc, State, Event, and Issue.
-
-Each test class covers one unit. Stubs call self.skipTest until they are
-implemented so they show up as pending in the test output.
-"""
+"""Tests for model.py: _as_utc, State, Event, and Issue."""
 
 from datetime import datetime, timedelta, timezone
 
