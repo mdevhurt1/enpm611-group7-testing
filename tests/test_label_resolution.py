@@ -184,7 +184,7 @@ class TestCalculateResolutionTimes(LabelResolutionTestCase):
         # with one. model.Issue.days_to_close() normalizes both with
         # _as_utc(), but this analysis subtracts them directly.
         issue = closed_issue(4)
-        issue["created_date"] = "2025-01-01T00:00:00"
+        issue["created_date"] = START.replace(tzinfo=None).isoformat()
         analysis = self.analysis_for([issue])
 
         self.assertAlmostEqual(analysis.issues[0].days_to_close(), 4.0)
